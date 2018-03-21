@@ -24,6 +24,8 @@ print('data chargée')
 #On fait des séries par jour
 dataset=[]
 df=df.drop('date',axis=1)
+df=df.drop('volume',axis=1)
+df=df.drop('quoteVolume',axis=1)
 for i in range(int(len(df)/288)):
     dataset.append(df[i*288:288*(i+1)].values)
 dataset=np.array(dataset)
@@ -44,7 +46,7 @@ np.random.seed(7)
 
 # PREPARATION OF TIME SERIES DATASE
 prices=dataset
-prices = np.reshape(prices, (len(prices),288,7)) # 1664
+prices = np.reshape(prices, (len(prices),288,5)) # 1664
 print(prices)
 #scaler = MinMaxScaler(feature_range=(0, 1))
 #OHLC_avg = scaler.fit_transform(prices)
@@ -61,7 +63,7 @@ testX, testY = new_dataset(test_OHLC, 1)
 print("On commence l'entrainement")
 # LSTM MODEL
 model = Sequential()
-model.add(LSTM(32, input_shape=(288, 7), return_sequences = True))
+model.add(LSTM(32, input_shape=(288, 5), return_sequences = True))
 model.add(LSTM(16))
 model.add(Dense(1))
 model.add(Activation('linear'))
@@ -69,7 +71,7 @@ model.add(Activation('linear'))
 
 # MODEL COMPILING AND TRAINING
 model.compile(loss='mean_squared_error', optimizer='adagrad') # Try SGD, adam, adagrad and compare!!!
-model.fit(trainX, trainY, epochs=20, batch_size=2, verbose=1)
+model.fit(trainX, trainY, epochs=40, batch_size=2, verbose=1)
 
 # model.compile(loss='binary_crossentropy', optimizer='adam') # Try SGD, adam, adagrad and compare!!!
 # model.fit(trainX, binTrainY, epochs=5, batch_size=64, verbose=1)
